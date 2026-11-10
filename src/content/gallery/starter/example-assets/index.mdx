@@ -1,0 +1,54 @@
+---
+title: Example Assets
+description: Every image and video in public/exampleassets, embedded with base-path-safe links.
+date: 2026-11-08
+---
+
+import Video from '../../../../components/Video.astro';
+import { withBase } from '../../../../lib/url';
+
+This page embeds the files in `public/exampleassets/`. Files in `public/` are not processed
+by Astro. They are copied to the site unchanged, so images are not resized.
+
+Each path goes through `withBase()`, which adds the site's base path when the site is hosted
+under a subpath (for example `/repo/exampleassets/...` on GitHub Pages). A bare
+`/exampleassets/...` path would break there.
+
+## Image: `LabCatSitsSquareSmall.jpg`
+
+<figure class="media">
+  <img src={withBase('/exampleassets/LabCatSitsSquareSmall.jpg')} alt="Lab cat sitting" width="756" height="756" loading="lazy" />
+  <figcaption>LabCatSitsSquareSmall.jpg</figcaption>
+</figure>
+
+## Video: `LabCatDraw.mp4`
+
+<Video
+  src={withBase('/exampleassets/LabCatDraw.mp4')}
+  poster={withBase('/exampleassets/LabCatSitsSquareSmall.jpg')}
+  caption="LabCatDraw.mp4: player controls, with the cat image as the poster"
+/>
+
+## Video: `LabCat3DSpin.mp4`
+
+<Video
+  src={withBase('/exampleassets/LabCat3DSpin.mp4')}
+  caption="LabCat3DSpin.mp4: autoplaying, looping, muted"
+  autoplay
+  loop
+/>
+
+## The code
+
+```mdx
+import Video from '../../../../components/Video.astro';
+import { withBase } from '../../../../lib/url';
+
+<img src={withBase('/exampleassets/LabCatSitsSquareSmall.jpg')} alt="Lab cat sitting" />
+
+<Video src={withBase('/exampleassets/LabCatDraw.mp4')} />
+<Video src={withBase('/exampleassets/LabCat3DSpin.mp4')} autoplay loop />
+```
+
+If you'd rather have Astro optimize the image, put it next to this file and use
+`![alt](./LabCatSitsSquareSmall.jpg)` instead.

@@ -1,0 +1,43 @@
+---
+// Usage in .mdx:
+//   import Video from '../../../components/Video.astro';
+//   import clip from './clip.mp4';
+//   <Video src={clip} caption="..." />
+interface Props {
+  src: string;
+  poster?: string | { src: string };
+  caption?: string;
+  controls?: boolean;
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  width?: number | string;
+}
+const {
+  src,
+  poster,
+  caption,
+  controls = true,
+  autoplay = false,
+  loop = false,
+  muted = autoplay, // browsers only autoplay muted video
+  width,
+} = Astro.props;
+const posterSrc = typeof poster === 'string' ? poster : poster?.src;
+// Videos fill the content column by default; `width` caps that.
+const maxWidth = width === undefined ? undefined : typeof width === 'number' ? `${width}px` : width;
+---
+<figure class="media" style={maxWidth && `max-width: ${maxWidth}`}>
+  <video
+    src={src}
+    poster={posterSrc}
+    controls={controls}
+    autoplay={autoplay}
+    loop={loop}
+    muted={muted}
+    playsinline
+    preload="metadata"
+    width={width}
+  ></video>
+  {caption && <figcaption>{caption}</figcaption>}
+</figure>

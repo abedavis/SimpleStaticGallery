@@ -1,0 +1,17 @@
+---
+import { getGalleryTree, parentPath } from '../lib/gallery';
+import { withBase } from '../lib/url';
+
+interface Props {
+  /** Path of the current page or section, e.g. "starter/getting-started". */
+  path: string;
+}
+const { sections } = await getGalleryTree();
+const parent = sections.get(parentPath(Astro.props.path))!;
+const href = withBase(parent.path ? `/${parent.path}/` : '/');
+---
+<p class="back"><a href={href}>← {parent.title}</a></p>
+
+<style>
+  .back { margin-top: 0; }
+</style>

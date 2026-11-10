@@ -1,0 +1,19 @@
+---
+title: MDX with Video
+description: An MDX page that embeds a co-located video and image using components.
+author: Example Student
+date: 2026-11-05
+thumbnail: ./poster.png
+---
+
+import Video from '../../../../components/Video.astro';
+import clip from './clip.mp4';
+import poster from './poster.png';
+
+This page is written in **MDX**, so it can import files and use components.
+
+<Video src={clip} poster={poster} caption="A short looping clip." loop />
+
+Regular Markdown images still work too:
+
+![Mandelbrot poster](./poster.png)

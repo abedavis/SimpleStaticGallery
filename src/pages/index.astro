@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import CardGrid from '../components/CardGrid.astro';
+import { getGalleryTree, sectionItems, ROOT_TITLE } from '../lib/gallery';
+
+const { root } = await getGalleryTree();
+const items = sectionItems(root);
+---
+<Base title={ROOT_TITLE} description="Gallery of student work.">
+  <h1>{ROOT_TITLE}</h1>
+  {items.length === 0 && <p>No pages yet. Add a .md or .mdx file to <code>src/content/gallery/</code>.</p>}
+  <CardGrid items={items} />
+</Base>

@@ -1,0 +1,84 @@
+---
+import { render } from 'astro:content';
+import Base from '../layouts/Base.astro';
+import BackLink from '../components/BackLink.astro';
+import CardGrid from '../components/CardGrid.astro';
+import { inlineMarkdown } from '../lib/inline-md';
+import { getGalleryTree, sectionItems, type GalleryEntry, type Section } from '../lib/gallery';
+
+type Props =
+  | { kind: 'section'; section: Section }
+  | { kind: 'page'; entry: GalleryEntry };
+
+export async function getStaticPaths() {
+  const { root, sections } = await getGalleryTree();
+  const paths: { params: { slug: string }; props: Props }[] = [];
+  for (const section of sections.values()) {
+    if (section !== root) {
+      paths.push({ params: { slug: section.path }, props: { kind: 'section', section } });
+    }
+    for (const entry of section.pages) {
+      paths.push({ params: { slug: entry.id }, props: { kind: 'page', entry } });
+    }
+  }
+  return paths;
+}
+
+const props = Astro.props;
+const path = props.kind === 'section' ? props.section.path : props.entry.id;
+// A section's own index.md (if any) provides intro content shown above its cards.
+const entry = props.kind === 'section' ? props.section.entry : props.entry;
+const Content = entry ? (await render(entry)).Content : undefined;
+
+const title = props.kind === 'section' ? props.section.title : props.entry.data.title;
+const description =
+  props.kind === 'section' ? props.section.description : props.entry.data.description;
+const author = entry?.data.author;
+const date = entry?.data.date;
+const tldr = entry?.data.tldr;
+---
+<Base title={title} description={description}>
+  {tldr && (
+    <aside class="tldr">
+      <h2 class="tldr-title">TL;DR</h2>
+      <p class="tldr-text"><Fragment set:html={inlineMarkdown(tldr)} /></p>
+    </aside>
+  )}
+  <BackLink path={path} />
+  <article>
+    <header>
+      <h1>{title}</h1>
+      {description && <p class="desc">{description}</p>}
+      {(author || date) && (
+        <p class="meta">
+          {author}
+          {author && date && ' · '}
+          {date && (
+            <time datetime={date.toISOString()}>
+              {date.toLocaleDateString('en-US', { dateStyle: 'long', timeZone: 'UTC' })}
+            </time>
+          )}
+        </p>
+      )}
+    </header>
+    {Content && <Content />}
+  </article>
+  {props.kind === 'section' && <CardGrid items={sectionItems(props.section)} />}
+</Base>
+
+<style>
+  header { border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
+  h1 { margin-bottom: 0.25rem; }
+  .desc { color: var(--muted); font-size: 1.1rem; margin-top: 0; }
+  .meta { color: var(--muted); font-size: 0.9rem; }
+  .tldr {
+    margin: 0 0 1.5rem;
+    padding: 1rem 1.25rem;
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-left: 4px solid var(--accent);
+    border-radius: 6px;
+  }
+  .tldr-title { margin: 0 0 0.4rem; font-size: 1.5rem; }
+  .tldr-text { margin: 0; font-size: 1.25rem; line-height: 1.5; }
+</style>
